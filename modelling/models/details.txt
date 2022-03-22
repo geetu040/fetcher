@@ -1,0 +1,32 @@
+-----> euler_model
+
+	_pos=True
+	_prev=False
+	_can=True
+	_sparse=False
+
+	epochs:   171
+	accuracy: 0.9992
+	loss:     0.0031
+
+-----> abs_model
+
+	_pos=True
+	_prev=False
+	_can=True
+	_sparse=False
+
+	epochs:   200
+	accuracy: 0.9998
+	val_acc:  1.0
+
+-----> manual_model
+
+	_pos=True
+	_prev=False
+	_can=True
+	_sparse=False
+
+	epochs:   200
+	accuracy: 0.9919
+	loss:     0.0432

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fetcher</title>
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<style>
+		:root {
+			--rows: {{params.rows}};
+			--cols: {{params.cols}};
+		}
+	</style>
+	<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+	<div id="container">
+		<div id="ins">
+Hi, <br>
+So we have 2 characters <br>
+Red is called FETCHER <br>
+Blue is called TARGET <br>
+<br>
+The Fetcher is supposed to find its way through the maze and get to the target <br>
+<br>
+You can control the movement of fetcher by the arrow keys <br>
+You can also automate the fetcher to catch the target <br><br>
+To automate you have three options <br><br>
+<b>Model 1: Euler</b> <span>[Accuracy: 0.9992, loss: 0.0031]</span><br>
+It tries to find the path that gives shortest hypotenues from target to fetcher. <br><br>
+<b>Model 2: Absolute</b> <span>[Accuracy: 0.9998, loss: 0.0028]</span> <br>
+It finds the shortest path by adding base and perpendicular. <br><br>
+<b>Model 3: Human</b> <span>[Accuracy: 0.9919, loss: 0.0432]</span> <br>
+It works like a person does, it doesnot care for the hypotenues or base or perpendicular.<br>
+<br>
+<hr>
+All 3 models are based on deep neural networks formed by tensorflow and keras <br>
+<a href="https://github.com/geetu040/fetcher/blob/main/more%20guide.txt" target="newtab">More..</a>
+		</div>
+		<div id="game">
+			{% for y in range(params.rows) %}
+				{% for x in range(params.cols) %}
+					{% if [x+1, y+1] not in params.map %}
+						<div class="obs" style="grid-area: {{y+1}}/{{x+1}};"></div>
+					{% endif %}
+				{% endfor %}
+			{% endfor %}
+			<div id="fet" style="grid-area: {{params.fet[1]}}/{{params.fet[0]}};"></div>
+			<div id="tar" style="grid-area: {{params.tar[1]}}/{{params.tar[0]}};"></div>
+		</div>
+		<div id="board">
+			<button class="game_btn" onclick="clearInterval(int_var);handle_ins()">Guide</button>
+			<button class="game_btn" onclick=" clearInterval(int_var);handle_ins('none') ">Pause</button>
+			<button class="game_btn" onclick=" report_action('change fetcher');handle_ins('none') ">Change Fetcher</button>
+			<button class="game_btn" onclick=" report_action('change target');handle_ins('none') ">Change Target</button>
+			<button class="game_btn" onclick=" enable_auto('1');handle_ins('none') ">Model 1: Euler</button>
+			<button class="game_btn" onclick=" enable_auto('2');handle_ins('none') ">Model 2: Absolute</button>
+			<button class="game_btn" onclick=" enable_auto('3');handle_ins('none') ">Model 3: Human</button>
+
+		</div>
+	</div>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="static/script.js">
+
+	</script>
+</body>
+</html>
