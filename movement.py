@@ -13,11 +13,10 @@ for model_name in models:
 	model.load_weights(weights_url)
 	models[model_name] = model
 
-
 class Movement():
-	def move_with_keys(self, dir, allowHit=True):
+	def move_with_keys(self, dir, data, allowHit=True):
 
-		next_cord = self.fet.copy()
+		next_cord = data['fet']
 		if dir == 'u':
 			next_cord[1] -= 1
 		elif dir == 'l':
@@ -28,36 +27,38 @@ class Movement():
 			next_cord[0] += 1
 
 		if (next_cord in self.map or allowHit) and (next_cord[0]!=0 and next_cord[1]!=0 and next_cord[0]!=self.cols+1 and next_cord[1]!=self.rows+1):
-			dataline = f'\n{self.fet[0]},{self.fet[1]},{self.tar[0]},{self.tar[1]},{self.best_dir},'
+			dataline = f"\n{data['fet'][0]},{data['fet'][1]},{data['tar'][0]},{data['tar'][1]},{data['prev_dir']},"
 
-			self.fet = next_cord[:]
-			self.best_dir = ['u', 'l', 'd', 'r'].index(dir)
+			data['fet'] = next_cord
+			data['prev_dir'] = ['u', 'l', 'd', 'r'].index(dir)
 
-			dataline += f'{self.best_dir}'
+			dataline += f"{data['prev_dir']}"
 			self.data += dataline
 
-	def move_with_alog(self, method='euler'):
+		return data
+
+	def move_with_alog(self, method, data):
 		possible_dirs = [
-			int([self.fet[0], self.fet[1]-1] in self.map),
-			int([self.fet[0]-1, self.fet[1]] in self.map),
-			int([self.fet[0], self.fet[1]+1] in self.map),
-			int([self.fet[0]+1, self.fet[1]] in self.map),
+			int([data['fet'][0], data['fet'][1]-1] in self.map),
+			int([data['fet'][0]-1, data['fet'][1]] in self.map),
+			int([data['fet'][0], data['fet'][1]+1] in self.map),
+			int([data['fet'][0]+1, data['fet'][1]] in self.map),
 		]
-		if self.best_dir != 4:
-			possible_dirs[(self.best_dir+2) % 4] = 0
+		if data['prev_dir'] != 4:
+			possible_dirs[(data['prev_dir']+2) % 4] = 0
 		if method == 'euler':
 			distances = [
-				(self.fet[0] - self.tar[0])**2 + (self.fet[1]-1 - self.tar[1])**2,
-				(self.fet[0]-1 - self.tar[0])**2 + (self.fet[1] - self.tar[1])**2,
-				(self.fet[0] - self.tar[0])**2 + (self.fet[1]+1 - self.tar[1])**2,
-				(self.fet[0]+1 - self.tar[0])**2 + (self.fet[1] - self.tar[1])**2,
+				(data['fet'][0] - data['tar'][0])**2 + (data['fet'][1]-1 - data['tar'][1])**2,
+				(data['fet'][0]-1 - data['tar'][0])**2 + (data['fet'][1] - data['tar'][1])**2,
+				(data['fet'][0] - data['tar'][0])**2 + (data['fet'][1]+1 - data['tar'][1])**2,
+				(data['fet'][0]+1 - data['tar'][0])**2 + (data['fet'][1] - data['tar'][1])**2,
 			]
 		elif method == 'abs':
 			distances = [
-				abs(self.fet[0] - self.tar[0]) + abs(self.fet[1]-1 - self.tar[1]),
-				abs(self.fet[0]-1 - self.tar[0]) + abs(self.fet[1] - self.tar[1]),
-				abs(self.fet[0] - self.tar[0]) + abs(self.fet[1]+1 - self.tar[1]),
-				abs(self.fet[0]+1 - self.tar[0]) + abs(self.fet[1] - self.tar[1]),
+				abs(data['fet'][0] - data['tar'][0]) + abs(data['fet'][1]-1 - data['tar'][1]),
+				abs(data['fet'][0]-1 - data['tar'][0]) + abs(data['fet'][1] - data['tar'][1]),
+				abs(data['fet'][0] - data['tar'][0]) + abs(data['fet'][1]+1 - data['tar'][1]),
+				abs(data['fet'][0]+1 - data['tar'][0]) + abs(data['fet'][1] - data['tar'][1]),
 			]
 			
 		best_dir = None
@@ -67,23 +68,24 @@ class Movement():
 				shortest_d = distances[i]
 				best_dir = i
 		
-		self.move_with_keys(dir=['u', 'l', 'd', 'r'][best_dir])
+		return self.move_with_keys(dir=['u', 'l', 'd', 'r'][best_dir], data=data)
 
-	def move_with_model(self, method):
+	def move_with_model(self, method, data):
 		X = [
-			self.fet[0] / 27,
-			self.fet[1] / 31,
-			self.tar[0] / 27,
-			self.tar[1] / 31,
-			int([self.fet[0], self.fet[1]-1] in self.map),
-			int([self.fet[0]-1, self.fet[1]] in self.map),
-			int([self.fet[0], self.fet[1]+1] in self.map),
-			int([self.fet[0]+1, self.fet[1]] in self.map),
+			data['fet'][0] / 27,
+			data['fet'][1] / 31,
+			data['tar'][0] / 27,
+			data['tar'][1] / 31,
+			int([data['fet'][0], data['fet'][1]-1] in self.map),
+			int([data['fet'][0]-1, data['fet'][1]] in self.map),
+			int([data['fet'][0], data['fet'][1]+1] in self.map),
+			int([data['fet'][0]+1, data['fet'][1]] in self.map),
 		]
-		if self.best_dir != 4:
-			X[ 4 + (self.best_dir+2)%4 ] = 0
+		if data['prev_dir'] != 4:
+			X[ 4 + (data['prev_dir']+2)%4 ] = 0
 		
 		pred = models[method].predict([X])
 		pred = list(pred[0]).index(max(pred[0]))
 		dir = ['u', 'l', 'd', 'r'][pred]
-		self.move_with_keys(dir, allowHit=True)
+
+		return self.move_with_keys(dir=dir, data=data)

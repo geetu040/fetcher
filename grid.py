@@ -12,75 +12,76 @@ class Grid(Movement):
 		self.steps = 0
 		self.missed = 0
 		self.best_dir = 4
-		self.fet = None
-		self.tar = None
 		self.data = ''
 
-		self.rePos(fet=True, tar=True)
+	def rePos(self, fet=False, tar=False, data=None):
+		new_fet = data['fet']
+		new_tar = data['tar']
 
-	def rePos(self, fet=False, tar=False):
-		self.steps = 0
-		self.best_dir = 4
-		cord_fet = random.choice(self.map)
-		cord_tar = random.choice(self.map)
-		if fet:
-			if cord_fet != self.fet:
-				self.fet = cord_fet
-			else:
-				self.rePos(fet=fet, tar=tar)
-		if tar:
-			if cord_tar != self.tar:
-				self.tar = cord_tar
-			else:
-				self.rePos(fet=fet, tar=tar)
+		if fet and tar:
+			new_fet = random.choice(self.map)
+			new_tar = random.choice(self.map)
+			while new_fet == data['fet'] or new_tar == data['tar'] or new_fet == new_tar:
+				new_fet = random.choice(self.map)
+				new_tar = random.choice(self.map)
+		elif fet:
+			new_fet = random.choice(self.map)
+			while new_fet == data['fet'] or new_fet == data['tar']:
+				new_fet = random.choice(self.map)
+		elif tar:
+			new_tar = random.choice(self.map)
+			while new_tar == data['fet'] or new_tar == data['tar']:
+				new_tar = random.choice(self.map)
 
-	def handle_action(self, action):
+		data['fet'] = new_fet
+		data['tar'] = new_tar
+		data['prev_dir'] = 4
+		data['steps'] = 0
+		return data
+
+	def handle_action(self, action, data):
 		if action == 'change fetcher':
-			self.rePos(fet=True)
+			new_data =  self.rePos(fet=True, data=data)
 		elif action == 'change target':
-			self.rePos(tar=True)
-		elif action == 'change both':
-			self.rePos(tar=True, fet=True)
+			new_data = self.rePos(tar=True, data=data)
 		elif 'Arrow' in action:
-			self.move(method='key', dir=action[5:6].lower())
+			new_data = self.move(method='key', dir=action[5:6].lower(), data=data)
 		elif action == ' ':
-			self.move(method='euler alog')
+			new_data = self.move(method='euler alog', data=data)
 		elif action == '0':
-			self.move(method='abs alog')
+			new_data = self.move(method='abs alog', data=data)
 		elif action == '1':
-			self.move(method='euler model')
+			new_data = self.move(method='euler model', data=data)
 		elif action == '2':
-			self.move(method='abs model')
+			new_data = self.move(method='abs model', data=data)
 		elif action == '3':
-			self.move(method='manual model')
-		elif action == 'Enter':
-			self.save()
-		elif action == 'Backspace':
-			self.data = ''
-			self.best_dir = 4
+			new_data = self.move(method='manual model', data=data)
+		# elif action == 'Enter':
+		# 	self.save()
+		# elif action == 'Backspace':
+		# 	self.data = ''
+		# 	self.best_dir = 4
+		return new_data
 
 
-	def move(self, method, dir=None):
-		self.steps += 1
-		if self.steps > 100:
-			self.rePos(tar=True)
+	def move(self, method, dir=None, data=None):
+		if data['steps'] > 100:
 			self.missed += 1
+			data = self.rePos(tar=True, data=data)
+
 		if method == 'key':
-			self.move_with_keys(dir=dir)
-		elif method == 'euler alog':
-			self.move_with_alog(method='euler')
-		elif method == 'abs alog':
-			self.move_with_alog(method='abs')
-		elif method == 'euler model':
-			self.move_with_model(method='euler')
-		elif method == 'abs model':
-			self.move_with_model(method='abs')
-		elif method == 'manual model':
-			self.move_with_model(method='manual')
+			new_data = self.move_with_keys(dir=dir, data=data)
+		elif 'alog' in method:
+			new_data = self.move_with_alog(method=method[:-5], data=data)
+		elif 'model' in method:
+			new_data = self.move_with_model(method=method[:-6], data=data)
 		
-		if self.fet == self.tar:
+		if data['fet'] == data['tar']:
 			self.score += 1
-			self.rePos(tar=True)
+			new_data = self.rePos(tar=True, data=new_data)
+		new_data['steps'] += 1
+
+		return new_data
 
 	def save(self):
 		if self.data != '':

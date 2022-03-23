@@ -47,8 +47,8 @@ All 3 models are based on deep neural networks formed by tensorflow and keras <b
 					{% endif %}
 				{% endfor %}
 			{% endfor %}
-			<div id="fet" style="grid-area: {{params.fet[1]}}/{{params.fet[0]}};"></div>
-			<div id="tar" style="grid-area: {{params.tar[1]}}/{{params.tar[0]}};"></div>
+			<div id="fet" style="grid-area: {{params.map[0][1]}}/{{params.map[0][0]}};"></div>
+			<div id="tar" style="grid-area: {{params.map[-1][1]}}/{{params.map[-1][0]}};"></div>
 		</div>
 		<div id="board">
 			<button class="game_btn" onclick="clearInterval(int_var);handle_ins()">Guide</button>

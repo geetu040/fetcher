@@ -1,18 +1,27 @@
-function reMap(fet_cord, tar_cord) {
-	fet.style.setProperty('grid-area', `${fet_cord[1]}/${fet_cord[0]}`)
-	tar.style.setProperty('grid-area', `${tar_cord[1]}/${tar_cord[0]}`)
-}
+prev_dir = 4
+steps = 0
 function report_action(action) {
 	returned = $.ajax({
 		type: 'GET',
-		data: { action: action },
+		data: {
+			'action': action,
+			'data': JSON.stringify({
+				fet: [parseInt(getComputedStyle(fet).getPropertyValue('grid-column-start')), parseInt(getComputedStyle(fet).getPropertyValue('grid-row-start'))],
+				tar: [parseInt(getComputedStyle(tar).getPropertyValue('grid-column-start')), parseInt(getComputedStyle(tar).getPropertyValue('grid-row-start'))],
+				prev_dir: prev_dir,
+				steps: steps,
+			})
+		},
 		url: '/act',
 		dataType: 'json',
 		async: false,
+		success: function(response) {
+			fet.style.setProperty('grid-area', `${response.fet[1]}/${response.fet[0]}`)
+			tar.style.setProperty('grid-area', `${response.tar[1]}/${response.tar[0]}`)
+			prev_dir = response.prev_dir
+			steps = response.steps
+		}
 	})
-	fet_cord = JSON.parse(returned.responseText).fet
-	tar_cord = JSON.parse(returned.responseText).tar
-	reMap(fet_cord, tar_cord)
 }
 document.addEventListener('keydown', (e)=>{
 	report_action(e.key)
