@@ -7,7 +7,7 @@ cols = 28
 with open('static/mapping.json', 'r') as f:
 	map = json.load(f)
 
-grid = Grid(rows, cols, map, record_file_url='current_dataset.csv')
+grid = Grid(rows, cols, map)
 
 app = Flask(__name__, template_folder='static')
 

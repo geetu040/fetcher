@@ -26,14 +26,14 @@ class Movement():
 		elif dir == 'r':
 			next_cord[0] += 1
 
+		# editing the data
 		if (next_cord in self.map or allowHit) and (next_cord[0]!=0 and next_cord[1]!=0 and next_cord[0]!=self.cols+1 and next_cord[1]!=self.rows+1):
-			dataline = f"\n{data['fet'][0]},{data['fet'][1]},{data['tar'][0]},{data['tar'][1]},{data['prev_dir']},"
-
 			data['fet'] = next_cord
 			data['prev_dir'] = ['u', 'l', 'd', 'r'].index(dir)
 
-			dataline += f"{data['prev_dir']}"
-			self.data += dataline
+		# if fetcher hits a wall
+		if (next_cord not in self.map and allowHit):
+			data['hits'] += 1
 
 		return data
 
@@ -46,14 +46,14 @@ class Movement():
 		]
 		if data['prev_dir'] != 4:
 			possible_dirs[(data['prev_dir']+2) % 4] = 0
-		if method == 'euler':
+		if method == 'euler':   # shortest hypotenuis
 			distances = [
 				(data['fet'][0] - data['tar'][0])**2 + (data['fet'][1]-1 - data['tar'][1])**2,
 				(data['fet'][0]-1 - data['tar'][0])**2 + (data['fet'][1] - data['tar'][1])**2,
 				(data['fet'][0] - data['tar'][0])**2 + (data['fet'][1]+1 - data['tar'][1])**2,
 				(data['fet'][0]+1 - data['tar'][0])**2 + (data['fet'][1] - data['tar'][1])**2,
 			]
-		elif method == 'abs':
+		elif method == 'abs':   # shortest base + perp
 			distances = [
 				abs(data['fet'][0] - data['tar'][0]) + abs(data['fet'][1]-1 - data['tar'][1]),
 				abs(data['fet'][0]-1 - data['tar'][0]) + abs(data['fet'][1] - data['tar'][1]),
@@ -81,11 +81,11 @@ class Movement():
 			int([data['fet'][0], data['fet'][1]+1] in self.map),
 			int([data['fet'][0]+1, data['fet'][1]] in self.map),
 		]
-		if data['prev_dir'] != 4:
+		if data['prev_dir'] != 4:   # removing backward direction from available directions
 			X[ 4 + (data['prev_dir']+2)%4 ] = 0
 		
 		pred = models[method].predict([X])
-		pred = list(pred[0]).index(max(pred[0]))
+		pred = list(pred[0]).index(max(pred[0]))  # fetching one with highest probability
 		dir = ['u', 'l', 'd', 'r'][pred]
 
 		return self.move_with_keys(dir=dir, data=data)

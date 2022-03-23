@@ -15,29 +15,31 @@
 	<link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-
 	<div id="container">
 		<div id="ins">
-Hi, <br>
-So we have 2 characters <br>
-Red is called FETCHER <br>
-Blue is called TARGET <br>
-<br>
-The Fetcher is supposed to find its way through the maze and get to the target <br>
-<br>
-You can control the movement of fetcher by the arrow keys <br>
-You can also automate the fetcher to catch the target <br><br>
-To automate you have three options <br><br>
-<b>Model 1: Euler</b> <span>[Accuracy: 0.9992, loss: 0.0031]</span><br>
-It tries to find the path that gives shortest hypotenues from target to fetcher. <br><br>
-<b>Model 2: Absolute</b> <span>[Accuracy: 0.9998, loss: 0.0028]</span> <br>
-It finds the shortest path by adding base and perpendicular. <br><br>
-<b>Model 3: Human</b> <span>[Accuracy: 0.9919, loss: 0.0432]</span> <br>
-It works like a person does, it doesnot care for the hypotenues or base or perpendicular.<br>
-<br>
-<hr>
-All 3 models are based on deep neural networks formed by tensorflow and keras <br>
-<a href="https://github.com/geetu040/fetcher/blob/main/more%20guide.txt" target="newtab">More..</a>
+
+			Hi, <br>
+			So we have 2 characters <br>
+			Red is called FETCHER <br>
+			Blue is called TARGET <br>
+			<br>
+			The Fetcher is supposed to find its way through the maze and get to the target <br>
+			If you fail to fetch in 100 steps, you miss the shot and target is replaced <br>
+			<br>
+			You can control the movement of fetcher by the arrow keys <br>
+			You can also automate the fetcher to catch the target <br><br>
+			To automate you have three options <br><br>
+			<b>Model 1: Euler</b> <span>[Accuracy: 0.9992, loss: 0.0031]</span><br>
+			It tries to find the path that gives shortest hypotenues from target to fetcher. <br><br>
+			<b>Model 2: Absolute</b> <span>[Accuracy: 0.9998, loss: 0.0028]</span> <br>
+			It finds the shortest path by adding base and perpendicular. <br><br>
+			<b>Model 3: Human</b> <span>[Accuracy: 0.9919, loss: 0.0432]</span> <br>
+			It works like a person does, it doesnot care for the hypotenues or base or perpendicular.<br>
+			<br>
+			<hr>
+			All 3 models are based on deep neural networks formed by tensorflow and keras <br>
+			<a href="https://github.com/geetu040/fetcher/blob/main/more%20guide.txt" target="newtab">More..</a>
+
 		</div>
 		<div id="game">
 			{% for y in range(params.rows) %}
@@ -50,15 +52,14 @@ All 3 models are based on deep neural networks formed by tensorflow and keras <b
 			<div id="fet" style="grid-area: {{params.map[0][1]}}/{{params.map[0][0]}};"></div>
 			<div id="tar" style="grid-area: {{params.map[-1][1]}}/{{params.map[-1][0]}};"></div>
 		</div>
-		<div id="board">
-			<button class="game_btn" onclick="clearInterval(int_var);handle_ins()">Guide</button>
+		<div id="menu">
 			<button class="game_btn" onclick=" clearInterval(int_var);handle_ins('none') ">Pause</button>
+			<button class="game_btn" onclick="clearInterval(int_var);handle_ins()">Guide</button>
 			<button class="game_btn" onclick=" report_action('change fetcher');handle_ins('none') ">Change Fetcher</button>
 			<button class="game_btn" onclick=" report_action('change target');handle_ins('none') ">Change Target</button>
 			<button class="game_btn" onclick=" enable_auto('1');handle_ins('none') ">Model 1: Euler</button>
 			<button class="game_btn" onclick=" enable_auto('2');handle_ins('none') ">Model 2: Absolute</button>
 			<button class="game_btn" onclick=" enable_auto('3');handle_ins('none') ">Model 3: Human</button>
-
 		</div>
 	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
